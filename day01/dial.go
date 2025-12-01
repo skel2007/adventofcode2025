@@ -7,14 +7,16 @@ import (
 )
 
 type Dial struct {
-	Position    uint8
-	ZeroCounter uint32
+	Position         uint8
+	ZeroCounter      uint32
+	TotalZeroCounter uint32
 }
 
 func NewDial() *Dial {
 	return &Dial{
-		Position:    50,
-		ZeroCounter: 0,
+		Position:         50,
+		ZeroCounter:      0,
+		TotalZeroCounter: 0,
 	}
 }
 
@@ -26,12 +28,24 @@ func (d *Dial) Rotate(str string) error {
 
 	switch rotation.direction {
 	case directionLeft:
-		d.Position = (d.Position + 100 - rotation.distance) % 100
+		newPosition := (d.Position + 100 - rotation.distance) % 100
+		if newPosition == 0 || (newPosition > d.Position && d.Position > 0) {
+			d.TotalZeroCounter++
+		}
+
+		d.Position = newPosition
 	case directionRight:
-		d.Position = (d.Position + rotation.distance) % 100
+		newPosition := (d.Position + rotation.distance) % 100
+		if newPosition < d.Position {
+			d.TotalZeroCounter++
+		}
+
+		d.Position = newPosition
 	default:
 		return fmt.Errorf("invalid direction: %d", rotation.direction)
 	}
+
+	d.TotalZeroCounter += rotation.circles
 
 	if d.Position == 0 {
 		d.ZeroCounter++
@@ -40,7 +54,7 @@ func (d *Dial) Rotate(str string) error {
 	return nil
 }
 
-func CalculatePassword(str string) (uint32, error) {
+func CalculatePasswords(str string) (uint32, uint32, error) {
 	dial := NewDial()
 	for _, str := range strings.Split(str, "\n") {
 		if strings.TrimSpace(str) == "" {
@@ -48,19 +62,19 @@ func CalculatePassword(str string) (uint32, error) {
 		}
 
 		if err := dial.Rotate(str); err != nil {
-			return 0, err
+			return 0, 0, err
 		}
 	}
 
-	return dial.ZeroCounter, nil
+	return dial.ZeroCounter, dial.TotalZeroCounter, nil
 }
 
-func CalculateExamplePassword() (uint32, error) {
-	return CalculatePassword(exampleInput)
+func CalculateExamplePasswords() (uint32, uint32, error) {
+	return CalculatePasswords(exampleInput)
 }
 
-func CalculateRealPassword() (uint32, error) {
-	return CalculatePassword(realInput)
+func CalculateRealPasswords() (uint32, uint32, error) {
+	return CalculatePasswords(realInput)
 }
 
 type direction int
@@ -73,6 +87,7 @@ const (
 type rotation struct {
 	direction direction
 	distance  uint8
+	circles   uint32
 }
 
 func parseRotation(str string) (*rotation, error) {
@@ -93,5 +108,6 @@ func parseRotation(str string) (*rotation, error) {
 	return &rotation{
 		direction: direction,
 		distance:  uint8(distance % 100),
+		circles:   uint32(distance / 100),
 	}, nil
 }

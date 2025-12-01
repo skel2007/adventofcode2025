@@ -2,19 +2,31 @@ package day01
 
 import "fmt"
 
-type Day struct{}
+type Day struct {
+	PartOnePassword uint32
+	PartTwoPassword uint32
+}
 
-func (d Day) PartOne() error {
-	password, err := CalculateRealPassword()
+func (d *Day) Init() error {
+	partOnePassword, partTwoPassword, err := CalculateRealPasswords()
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Password: %d\n", password)
+	d.PartOnePassword = partOnePassword
+	d.PartTwoPassword = partTwoPassword
 
 	return nil
 }
 
-func (d Day) PartTwo() error {
+func (d *Day) PartOne() error {
+	fmt.Printf("Password: %d\n", d.PartOnePassword)
+
+	return nil
+}
+
+func (d *Day) PartTwo() error {
+	fmt.Printf("Password: %d\n", d.PartTwoPassword)
+
 	return nil
 }
