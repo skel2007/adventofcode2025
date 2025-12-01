@@ -69,14 +69,6 @@ func CalculatePasswords(str string) (uint32, uint32, error) {
 	return dial.ZeroCounter, dial.TotalZeroCounter, nil
 }
 
-func CalculateExamplePasswords() (uint32, uint32, error) {
-	return CalculatePasswords(exampleInput)
-}
-
-func CalculateRealPasswords() (uint32, uint32, error) {
-	return CalculatePasswords(realInput)
-}
-
 type direction int
 
 const (

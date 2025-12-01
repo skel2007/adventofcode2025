@@ -8,7 +8,7 @@ type Day struct {
 }
 
 func (d *Day) Init() error {
-	partOnePassword, partTwoPassword, err := CalculateRealPasswords()
+	partOnePassword, partTwoPassword, err := CalculatePasswords(realInput)
 	if err != nil {
 		return err
 	}
