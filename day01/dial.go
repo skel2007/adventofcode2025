@@ -56,12 +56,12 @@ func (d *Dial) Rotate(str string) error {
 
 func CalculatePasswords(str string) (uint32, uint32, error) {
 	dial := NewDial()
-	for _, str := range strings.Split(str, "\n") {
-		if strings.TrimSpace(str) == "" {
+	for _, line := range strings.Split(str, "\n") {
+		if strings.TrimSpace(line) == "" {
 			continue
 		}
 
-		if err := dial.Rotate(str); err != nil {
+		if err := dial.Rotate(line); err != nil {
 			return 0, 0, err
 		}
 	}

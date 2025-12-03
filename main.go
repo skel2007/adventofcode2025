@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"adventofcode2025/day01"
+	"adventofcode2025/day02"
 )
 
 type Day interface {
@@ -26,6 +27,8 @@ func main() {
 	switch dayN {
 	case "1":
 		day = &day01.Day{}
+	case "2":
+		day = &day02.Day{}
 	default:
 		fmt.Printf("Unknown day: %s\n", dayN)
 		os.Exit(1)
