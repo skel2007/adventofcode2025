@@ -1,126 +1,90 @@
 package day02
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 )
 
-type ProductID uint64
+type ProductID string
 
-func (id ProductID) CeilSeq() (uint64, error) {
-	s := strconv.FormatUint(uint64(id), 10)
-	if len(s)%2 == 1 {
-		var result uint64 = 1
-		for i := 0; i < len(s)/2; i++ {
-			result *= 10
+func (id ProductID) CeilSeq(n int) (uint64, error) {
+	if len(id)%n == 0 {
+		first, err := strconv.ParseUint(string(id[:len(id)/n]), 10, 64)
+		if err != nil {
+			return 0, err
 		}
 
-		return result, nil
-	}
+		prev := first
+		for i := 1; i < n; i++ {
+			start := i * (len(id) / n)
+			end := (i + 1) * (len(id) / n)
 
-	mod := uint64(1)
-	for i := 0; i < len(s)/2; i++ {
-		mod *= 10
-	}
+			next, err := strconv.ParseUint(string(id[start:end]), 10, 64)
+			if err != nil {
+				return 0, err
+			}
 
-	first := uint64(id) / mod
-	second := uint64(id) % mod
+			if prev < next {
+				return first + 1, nil
+			}
 
-	if first < second {
-		return first + 1, nil
-	}
+			if prev > next {
+				return first, nil
+			}
 
-	return first, nil
-}
-
-func (id ProductID) FloorSeq() (uint64, error) {
-	s := strconv.FormatUint(uint64(id), 10)
-	if len(s)%2 == 1 {
-		var result uint64 = 1
-		for i := 0; i < len(s)/2; i++ {
-			result *= 10
+			prev = next
 		}
 
-		return result - 1, nil
-	}
-
-	mod := uint64(1)
-	for i := 0; i < len(s)/2; i++ {
-		mod *= 10
-	}
-
-	first := uint64(id) / mod
-	second := uint64(id) % mod
-
-	if first <= second {
 		return first, nil
 	}
 
-	return first - 1, nil
+	result := "1" + strings.Repeat("0", len(id)/n)
+	return strconv.ParseUint(result, 10, 64)
 }
 
-type Range struct {
-	Start ProductID
-	End   ProductID
+func (id ProductID) FloorSeq(n int) (uint64, error) {
+	if len(id) < n {
+		return 0, nil
+	}
+
+	if len(id)%n == 0 {
+		first, err := strconv.ParseUint(string(id[:len(id)/n]), 10, 64)
+		if err != nil {
+			return 0, err
+		}
+
+		prev := first
+		for i := 1; i < n; i++ {
+			start := i * (len(id) / n)
+			end := (i + 1) * (len(id) / n)
+
+			next, err := strconv.ParseUint(string(id[start:end]), 10, 64)
+			if err != nil {
+				return 0, err
+			}
+
+			if prev < next {
+				return first, nil
+			}
+
+			if prev > next {
+				return first - 1, nil
+			}
+
+			prev = next
+		}
+
+		return first, nil
+	}
+
+	result := strings.Repeat("9", len(id)/n)
+	return strconv.ParseUint(result, 10, 64)
 }
 
-func ParseRange(str string) (*Range, error) {
-	dash := strings.Index(str, "-")
-	if dash == -1 {
-		return nil, fmt.Errorf("invalid range: '%s'", str)
-	}
+func SumInvalidProductIIDs(str string) (uint64, uint64, error) {
+	var sumSimple, sumAll uint64
+	var uniqueIDs = make(map[uint64]struct{})
 
-	start, err := strconv.Atoi(str[:dash])
-	if err != nil {
-		return nil, err
-	}
-
-	end, err := strconv.Atoi(str[dash+1:])
-	if err != nil {
-		return nil, err
-	}
-
-	return &Range{
-		Start: ProductID(start),
-		End:   ProductID(end),
-	}, nil
-}
-
-func (r *Range) FindInvalidIDs() ([]ProductID, error) {
-	startSeq, err := r.Start.CeilSeq()
-	if err != nil {
-		return nil, err
-	}
-
-	endSeq, err := r.End.FloorSeq()
-	if err != nil {
-		return nil, err
-	}
-
-	var result []ProductID
-	for seq := startSeq; seq <= endSeq; seq++ {
-		invalidID := seqToInvalidID(seq)
-		result = append(result, invalidID)
-	}
-
-	return result, nil
-}
-
-func seqToInvalidID(seq uint64) ProductID {
-	s := strconv.FormatUint(seq, 10)
-
-	result := seq
-	for i := 0; i < len(s); i++ {
-		result *= 10
-	}
-
-	result += seq
-	return ProductID(result)
-}
-
-func SumInvalidProductIIDs(str string) (uint64, error) {
-	var result uint64
 	for _, line := range strings.Split(str, "\n") {
 		if strings.TrimSpace(line) == "" {
 			continue
@@ -129,19 +93,33 @@ func SumInvalidProductIIDs(str string) (uint64, error) {
 		for _, s := range strings.Split(line, ",") {
 			r, err := ParseRange(s)
 			if err != nil {
-				return 0, err
+				return 0, 0, err
 			}
 
 			invalidIDs, err := r.FindInvalidIDs()
 			if err != nil {
-				return 0, err
+				return 0, 0, err
 			}
 
 			for _, id := range invalidIDs {
-				result += uint64(id)
+				value, err := id.Value()
+				if err != nil {
+					return 0, 0, err
+				}
+
+				if _, ok := uniqueIDs[value]; ok {
+					continue
+				}
+
+				if id.n == 2 {
+					sumSimple += value
+				}
+
+				sumAll += value
+				uniqueIDs[value] = struct{}{}
 			}
 		}
 	}
 
-	return result, nil
+	return sumSimple, sumAll, nil
 }

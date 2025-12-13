@@ -3,26 +3,30 @@ package day02
 import "fmt"
 
 type Day struct {
-	SumInvalidProductIIDs uint64
+	Sum1 uint64
+	Sum2 uint64
 }
 
 func (d *Day) Init() error {
-	sumInvalidProductIIDs, err := SumInvalidProductIIDs(realInput)
+	sum1, sum2, err := SumInvalidProductIIDs(realInput)
 	if err != nil {
 		return err
 	}
 
-	d.SumInvalidProductIIDs = sumInvalidProductIIDs
+	d.Sum1 = sum1
+	d.Sum2 = sum2
 
 	return nil
 }
 
 func (d *Day) PartOne() error {
-	fmt.Printf("Result: %d\n", d.SumInvalidProductIIDs)
+	fmt.Printf("Result: %d\n", d.Sum1)
 
 	return nil
 }
 
 func (d *Day) PartTwo() error {
+	fmt.Printf("Result: %d\n", d.Sum2)
+
 	return nil
 }
