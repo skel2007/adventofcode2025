@@ -18,9 +18,8 @@ func TestCountFreshIDs(t *testing.T) {
 			args: args{
 				str: exampleInput,
 			},
-			want1:   3,
-			want2:   14,
-			wantErr: false,
+			want1: 3,
+			want2: 14,
 		},
 	}
 	for _, tt := range tests {
