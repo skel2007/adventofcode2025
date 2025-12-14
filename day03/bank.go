@@ -9,27 +9,34 @@ type Bank struct {
 	batteries string
 }
 
-func (b *Bank) Joltage() (uint64, error) {
-	f := 0
-	for i := 1; i < len(b.batteries)-1; i++ {
-		if b.batteries[i] > b.batteries[f] {
-			f = i
+func (b *Bank) Joltage(n int) (uint64, error) {
+	result := make([]int, n)
+
+	for i := 0; i < n; i++ {
+		if i > 0 {
+			result[i] = result[i-1] + 1
+		}
+
+		for j := result[i] + 1; j < len(b.batteries)-n+i+1; j++ {
+			if b.batteries[j] > b.batteries[result[i]] {
+				result[i] = j
+			}
 		}
 	}
 
-	s := f + 1
-	for i := f + 2; i < len(b.batteries); i++ {
-		if b.batteries[i] > b.batteries[s] {
-			s = i
-		}
+	joltage := ""
+	for _, i := range result {
+		u := string(b.batteries[i])
+		joltage += u
 	}
 
-	result := string(b.batteries[f]) + string(b.batteries[s])
-	return strconv.ParseUint(result, 10, 64)
+	return strconv.ParseUint(joltage, 10, 64)
 }
 
-func TotalJoltage(str string) (uint64, error) {
-	result := uint64(0)
+func TotalJoltage(str string) (uint64, uint64, error) {
+	result2 := uint64(0)
+	result12 := uint64(0)
+
 	for _, line := range strings.Split(str, "\n") {
 		if strings.TrimSpace(line) == "" {
 			continue
@@ -37,13 +44,19 @@ func TotalJoltage(str string) (uint64, error) {
 
 		bank := Bank{line}
 
-		joltage, err := bank.Joltage()
+		joltage2, err := bank.Joltage(2)
 		if err != nil {
-			return 0, err
+			return 0, 0, err
 		}
 
-		result += joltage
+		joltage12, err := bank.Joltage(12)
+		if err != nil {
+			return 0, 0, err
+		}
+
+		result2 += joltage2
+		result12 += joltage12
 	}
 
-	return result, nil
+	return result2, result12, nil
 }
