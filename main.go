@@ -8,6 +8,7 @@ import (
 	"adventofcode2025/day02"
 	"adventofcode2025/day03"
 	"adventofcode2025/day04"
+	"adventofcode2025/day05"
 )
 
 type Day interface {
@@ -35,6 +36,8 @@ func main() {
 		day = &day03.Day{}
 	case "4":
 		day = &day04.Day{}
+	case "5":
+		day = &day05.Day{}
 	default:
 		fmt.Printf("Unknown day: %s\n", dayN)
 		os.Exit(1)
