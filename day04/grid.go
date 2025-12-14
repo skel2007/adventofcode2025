@@ -11,29 +11,30 @@ type Coordinate struct {
 }
 
 type Grid struct {
-	Rolls map[int]map[int]bool
+	Rolls [][]bool
 }
 
 func ParseGrid(str string) (*Grid, error) {
-	rolls := make(map[int]map[int]bool)
+	var rolls [][]bool
 
-	for i, line := range strings.Split(str, "\n") {
+	for _, line := range strings.Split(str, "\n") {
 		if strings.TrimSpace(line) == "" {
 			continue
 		}
 
-		rolls[i] = make(map[int]bool)
-
-		for j, c := range line {
+		row := make([]bool, len(line))
+		for _, c := range line {
 			switch c {
 			case '.':
-				rolls[i][j] = false
+				row = append(row, false)
 			case '@':
-				rolls[i][j] = true
+				row = append(row, true)
 			default:
 				return nil, fmt.Errorf("grid: invalid character '%c'", c)
 			}
 		}
+
+		rolls = append(rolls, row)
 	}
 
 	return &Grid{
