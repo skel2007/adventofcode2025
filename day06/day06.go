@@ -3,16 +3,18 @@ package day06
 import "fmt"
 
 type Day struct {
-	GrandTotal int
+	GrandTotal           int
+	GrandTotalCephalopod int
 }
 
 func (d *Day) Init() error {
-	grandTotal, err := GrandTotal(realInput)
+	grandTotal, grandTotalCephalopod, err := GrandTotal(realInput)
 	if err != nil {
 		return err
 	}
 
 	d.GrandTotal = grandTotal
+	d.GrandTotalCephalopod = grandTotalCephalopod
 
 	return nil
 }
@@ -24,7 +26,7 @@ func (d *Day) PartOne() error {
 }
 
 func (d *Day) PartTwo() error {
-	fmt.Printf("Part Two: %d\n", d.GrandTotal)
+	fmt.Printf("Part Two: %d\n", d.GrandTotalCephalopod)
 
 	return nil
 }
