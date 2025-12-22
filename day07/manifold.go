@@ -57,48 +57,76 @@ func ParseManifold(str string) (*Manifold, error) {
 	}, nil
 }
 
-func (m *Manifold) CountSplits() (int, error) {
-	tachyon := make(map[int]bool)
-	result := 0
+func (m *Manifold) Next(i int, j int) (map[int]int, int, error) {
+	cell := m.diagram[i][j]
+
+	next := make(map[int]int)
+	splits := 0
+
+	switch cell {
+	case CellSpace:
+		next[j]++
+	case CellSplitter:
+		splits++
+
+		next[j-1]++
+		next[j+1]++
+	default:
+		return nil, 0, fmt.Errorf("invalid cell [%d; %d]: %q", i, j, cell)
+	}
+
+	return next, splits, nil
+}
+
+func (m *Manifold) Teleport() (int, int, error) {
+	tachyon := make(map[int]int)
+
+	countSplits := 0
 
 	for i, line := range m.diagram {
 		if len(tachyon) == 0 {
 			for j, cell := range line {
 				if cell == CellStart {
-					tachyon[j] = true
+					tachyon[j] = 1
 				}
 			}
 
 			continue
 		}
 
-		nextTachyon := make(map[int]bool)
-		for j := range tachyon {
-			cell := line[j]
+		nextTachyon := make(map[int]int)
+		for j, t := range tachyon {
+			cell := m.diagram[i][j]
+
 			switch cell {
 			case CellSpace:
-				nextTachyon[j] = true
+				nextTachyon[j] += t
 			case CellSplitter:
-				result++
+				countSplits++
 
-				nextTachyon[j-1] = true
-				nextTachyon[j+1] = true
+				nextTachyon[j-1] += t
+				nextTachyon[j+1] += t
 			default:
-				return 0, fmt.Errorf("invalid cell [%d; %d]: %q", i, j, cell)
+				return 0, 0, fmt.Errorf("invalid cell [%d; %d]: %q", i, j, cell)
 			}
 		}
 
 		tachyon = nextTachyon
 	}
 
-	return result, nil
-}
-
-func CountSplits(str string) (int, error) {
-	m, err := ParseManifold(str)
-	if err != nil {
-		return 0, err
+	countTracks := 0
+	for _, t := range tachyon {
+		countTracks += t
 	}
 
-	return m.CountSplits()
+	return countSplits, countTracks, nil
+}
+
+func Teleport(str string) (int, int, error) {
+	m, err := ParseManifold(str)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return m.Teleport()
 }

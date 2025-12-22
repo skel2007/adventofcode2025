@@ -2,14 +2,15 @@ package day07
 
 import "testing"
 
-func TestCountSplits(t *testing.T) {
+func TestTeleport(t *testing.T) {
 	type args struct {
 		str string
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    int
+		want1   int
+		want2   int
 		wantErr bool
 	}{
 		{
@@ -17,18 +18,22 @@ func TestCountSplits(t *testing.T) {
 			args: args{
 				str: exampleInput,
 			},
-			want: 21,
+			want1: 21,
+			want2: 40,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := CountSplits(tt.args.str)
+			got1, got2, err := Teleport(tt.args.str)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("CountSplits() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Teleport() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if got != tt.want {
-				t.Errorf("CountSplits() got = %v, want %v", got, tt.want)
+			if got1 != tt.want1 {
+				t.Errorf("Teleport() got1 = %v, want1 %v", got1, tt.want1)
+			}
+			if got2 != tt.want2 {
+				t.Errorf("Teleport() got2 = %v, want2 %v", got2, tt.want2)
 			}
 		})
 	}

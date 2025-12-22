@@ -4,15 +4,17 @@ import "fmt"
 
 type Day struct {
 	CountSplits int
+	CountTracks int
 }
 
 func (d *Day) Init() error {
-	count, err := CountSplits(realInput)
+	countSplits, countTracks, err := Teleport(realInput)
 	if err != nil {
 		return err
 	}
 
-	d.CountSplits = count
+	d.CountSplits = countSplits
+	d.CountTracks = countTracks
 
 	return nil
 }
@@ -24,5 +26,7 @@ func (d *Day) PartOne() error {
 }
 
 func (d *Day) PartTwo() error {
+	fmt.Printf("Part Two: %d\n", d.CountTracks)
+
 	return nil
 }
